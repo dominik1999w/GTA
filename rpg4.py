@@ -3,20 +3,29 @@ import pygame
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
+GREEN = (50,140,0)
 RED = (255, 0, 0)
 PURPLE = (255, 0, 255)
-# Nazwy plikow png -------------------------------------------------------------------------------------------------------
-heart = "heart.png"
-flower = "flower.png"
-tadeusz = "tadeusz.png"
-mushroom = "mushroom.png"
 
 pygame.init()
+
+# Nazwy plikow png -------------------------------------------------------------------------------------------------------
+heart = pygame.image.load("heart.png")
+flower = "flower.png"
+tadeuszP = "tadko.png"
+mushroom = "mushroom.png"
+zameksign = "zameksign.png"
+zosiaP = "zosia.png"
+barX = "barX.png"
+barY = "barY.png"
+
+#zmienne pomocnicze globalne-----------------------------------------------------------
 points = { 'zosia': 0, 'hrabia': 0, 'mushroom': 0}
 score = 0
 showme = ""
-myfont = pygame.font.SysFont("Arial", 15)
+lives = 3
+#---------------------------------------------------------------------------------------
+myfont = pygame.font.SysFont("Georgia", 15)
 class Character(pygame.sprite.Sprite):
     def __init__(self, name, x, y, pic , text):
         super().__init__()
@@ -29,9 +38,9 @@ class Character(pygame.sprite.Sprite):
         self.rect.x = x
 
 # definicje postaci -------------------------------------------------------------------------------------------------------
-hrabia =Character("hrabia",60,300,tadeusz,"jestem hrabia")
-zosia = Character("zosia", 10, 200, heart, "jestem Zosia")
-
+hrabia =Character("hrabia",60,300,tadeuszP,"jestem hrabia")
+zosia = Character("zosia", 30, 200, zosiaP, "jestem Zosia")
+#----------------------------------------------------------------------------------------------------------------------------
 
 class Wall(pygame.sprite.Sprite):
 
@@ -39,7 +48,7 @@ class Wall(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(pic )
         self.name = name
-        
+        # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
@@ -51,7 +60,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load(tadeusz)
+        self.image = pygame.image.load(tadeuszP)
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
@@ -122,7 +131,8 @@ class Room1(Room):
     def __init__(self):
         super().__init__()
 
-        walls = [["a",50, 0, flower],
+        # lista obiektow w pokoju (nazwa wsporzedne x i y i obrazek do podstawienia) - DO ZMIANY
+        walls = [["zameksign",50, 280, zameksign],
                  ["b",150, 250, flower],
                  ["c",250, 480, flower]
                  ]
@@ -130,9 +140,6 @@ class Room1(Room):
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
             self.wall_list.add(wall)
-        ##############################################################3
-        self.char_list.add(zosia)
-        self.char_list.add(hrabia)
 
 
 class Room2(Room):
@@ -141,9 +148,10 @@ class Room2(Room):
     def __init__(self):
         super().__init__()
 
-        walls = [["d",0, 0, flower],
-                 ["e",0, 350, flower],
-                 ["f",780, 0, flower],
+        # DO ZMIANY:
+        walls = [["krawedz",780, 0, barY],
+                 ["krawedz",0, 0, barX],
+                 ["krawedz",0, 580, barX],
                  ["mushroom",680, 350, mushroom]
                  ]
 
@@ -158,13 +166,32 @@ class Room3(Room):
     def __init__(self):
         super().__init__()
 
-        #DO ZMIANY
-        walls = [["h",200, 0, flower]
+        walls = [["krawedz", 0, 0, barY],
+                 ["krawedz", 0, 0, barX],
+                 ["krawedz", 0, 580, barX]
                  ]
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
             self.wall_list.add(wall)
+        ##############################################################3
+        self.char_list.add(zosia)
+        self.char_list.add(hrabia)
+class Room4(Room):
+    """wszystko w 3. pokoju"""
 
+    def __init__(self):
+        super().__init__()
+
+        walls = [["krawedz", 0, 0, barY],
+                 ["krawedz", 0, 0, barX],
+                 ["krawedz", 780, 0, barY]
+                 ]
+        for item in walls:
+            wall = Wall(item[0], item[1], item[2], item[3])
+            self.wall_list.add(wall)
+        ##############################################################3
+        self.char_list.add(zosia)
+        self.char_list.add(hrabia)
 def main():
     """ Main Program """
     #
@@ -185,10 +212,14 @@ def main():
     room = Room3()
     rooms.append(room)
 
+    room = Room4()
+    rooms.append(room)
+
     current_room_no = 0
     current_room = rooms[current_room_no]
 
     clock = pygame.time.Clock()
+
     # --------------------------------------------------------------
     f = pygame.font.SysFont('Bevan', 70);
     t = f.render('GTA', True, (255, 255, 255));
@@ -196,7 +227,8 @@ def main():
     screen.blit(t, (170, 120));
     pygame.display.update();
     pygame.time.wait(1100);
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
     done = False
 
     while not done:
@@ -257,17 +289,30 @@ def main():
                 current_room_no = 0
                 current_room = rooms[current_room_no]
                 player.rect.x = 0
+        if player.rect.y < -15:
+            current_room_no = 3
+            current_room = rooms[current_room_no]
+            player.rect.y = 600
+        if player.rect.y > 600:
+            current_room_no = 0
+            current_room = rooms[current_room_no]
+            player.rect.y = 0
 
         # --- Drawing on screen---
-        screen.fill(WHITE)
+        screen.fill(GREEN)
         global score
         movingsprites.draw(screen)
         current_room.wall_list.draw(screen) # wyswietlanie scian
         current_room.char_list.draw(screen) # wyswietlanie postaci
         label = myfont.render(showme, 1, (5, 5, 0))  # TEKST postaci
         screen.blit(label, (200, 100))
-        points = myfont.render("Wynik: " + str(score), 1, (5, 5, 0)) # WYNIK
-        screen.blit(points, (600,10))
+        points = myfont.render("Wynik: " + str(score), 1, WHITE) # WYNIK
+        screen.blit(points, (720,2))
+        if lives>2:
+            screen.blit(heart, (640,3)) # ZYCIA
+        if lives>1:
+            screen.blit(heart, (660,3)) # ZYCIA
+        screen.blit(heart, (680,3)) # ZYCIA
 
         pygame.display.flip()
 

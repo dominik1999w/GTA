@@ -14,7 +14,7 @@ pygame.init()
 # nazwy plikow png -----------------------------------------------------------------------------------------------------
 heart = pygame.image.load("heart.png")
 flower = "flower.png"
-cloud = "chmura.png"
+cloud = pygame.image.load("chmura.png")
 tadeuszP = "tadko.png"
 telimenaP = "telimena.png"
 zosiaP = "zosia.png"
@@ -47,7 +47,7 @@ def text_on_screen(text, color, font_name, size, y_displace=0):
     gameDisplay.blit(text_surf, text_rect)
 
 # zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
-points = {'zosia': 0, 'hrabia': 0, 'mushroom': 0, 'dworek': 0}
+points = {'zosia': 0, 'hrabia': 0, 'mushroom': 0, 'dworek': 0, 'zamek':0}
 myfont = pygame.font.SysFont("Georgia", 15)
 score = 0
 showme = ""
@@ -200,6 +200,10 @@ class Player(pygame.sprite.Sprite):
                     points['dworek'] = 1
                     score += 1
                     cr = 3
+            elif block.name == "zamek":
+                if points['zamek'] == 0:
+                    cr = 8
+                    self.rect.bottom = 575
             if self.change_y > 0:
                 self.rect.bottom = block.rect.top
             else:
@@ -275,7 +279,8 @@ class Room3(Room):
 
         walls = [["krawedz", 0, 0, barY],
                  ["krawedz", 0, 0, barX],
-                 ["krawedz", 0, 580, barX]
+                 ["krawedz", 0, 580, barX],
+                 ["zamek",250,200,"zamek.png"]
                  ]
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
@@ -364,7 +369,7 @@ class Room7(Room):
 
 class wdworku(Room):
     """wszystko w dworku"""
-
+#cr =7
     def __init__(self):
         super().__init__("floor.png")
 
@@ -383,6 +388,24 @@ class wdworku(Room):
         self.animal_list.add(mucha2)
         self.animal_list.add(mucha3)
         self.animal_list.add(mucha4)
+
+class wzamku(Room):
+    """wszystko w dworku"""
+    # cr =8
+
+    def __init__(self):
+        super().__init__("floor.png")
+
+        walls = [["krawedz", 0, 0, barY],
+                 ["krawedzX", 0, 0, barX],
+                 ["krawedz", 0, 580, barX],
+                 ["krawedz", 780, 0, barY]
+                 ]
+        for item in walls:
+            wall = Wall(item[0], item[1], item[2], item[3])
+            self.wall_list.add(wall)
+
+        # #############################################################3
 
 
 def main():
@@ -413,6 +436,8 @@ def main():
     room = Room7()
     rooms.append(room)
     room = wdworku()
+    rooms.append(room)
+    room = wzamku()
     rooms.append(room)
 
     current_room_no = 0
@@ -465,7 +490,7 @@ def main():
                 if event.key == pygame.K_DOWN:
                     player.changespeed(0, 5)
 
-            if event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     player.changespeed(5, 0)
                 if event.key == pygame.K_RIGHT:
@@ -542,7 +567,6 @@ def main():
                 player.rect.y = 0
 
         # --- Drawing on screen ---
-        screen.fill(GREEN)
         screen.blit(current_room.room_background, [0, 0])
         global score
         movingsprites.draw(screen)
@@ -550,8 +574,7 @@ def main():
         current_room.char_list.draw(screen)  # wyswietlanie postaci
         current_room.animal_list.draw(screen)  # wyswietlanie zwierzat
         if cloud_att:  # wyswietlanie chmury
-            our_cloud = pygame.image.load(cloud)
-            screen.blit(our_cloud, cloud_coord)
+            screen.blit(cloud, cloud_coord)
         label = myfont.render(showme, 1, (5, 5, 0))  # TEKST postaci
         screen.blit(label, (cloud_coord[0] + 95, cloud_coord[1] + 85))
         points = myfont.render("Wynik: " + str(score), 1, WHITE)  # WYNIK

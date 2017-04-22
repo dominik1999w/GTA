@@ -14,23 +14,49 @@ pygame.init()
 # nazwy plikow png -----------------------------------------------------------------------------------------------------
 heart = pygame.image.load("heart.png")
 flower = "flower.png"
-cloud = pygame.image.load("chmura.png")
 tadeuszP = "tadko.png"
 telimenaP = "telimena.png"
+wojskiP = "wojski.png"
 zosiaP = "zosia.png"
 sedziaP = "sedzia.png"
 hrabiaP = "hrabia.png"
+gerwazyP = "gerwazy.png"
+mackoP = "macko.png"
 mushroom = "mushroom.png"
-zameksign = "zameksign.png"
 barX = "barX.png"
 barY = "barY.png"
+zameksign = "zameksign.png"
 lassign = "lassign.png"
 dworeksign = "dworeksign.png"
 dobrzynsign = "dobrzyn.png"
 dworekP = "dworek.png"
+zamekP = "zamek.png"
+ramka = pygame.image.load("ramka.png")
 
-# funkcje wyswietlania tekstu ----------------------------------------------------------------------------------------
+# zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
+points = {'zosia': 0, 'hrabia': 0, 'mushroom': 0, 'dworek': 0, 'zamek': 0}
+answers = {'zosia': 0, 'telimena': 0, 'gerwazy': 0, 'macko': 0, 'sedzia': 0, 'wojski': 0, 'hrabia': 0}
+myfont = pygame.font.SysFont("Bevan", 21)
+score = 0
+text_field_att = False
+char = 'zosia'
+lives = 3
+cr = 0  # wejscie do dworku / zamku
+
+# funkcje wyswietlania tekstu ------------------------------------------------------------------------------------------
 gameDisplay = pygame.display.set_mode((800, 600))
+
+
+def texts(lines):
+    text = myfont.render('', 1, WHITE)
+    textrect = text.get_rect()
+    textrect.x = 34
+    textrect.y = -6
+    lines = lines.split('\n')
+    for i in lines:
+        text = myfont.render(i, 1, WHITE)
+        textrect.centery += 22
+        gameDisplay.blit(text, textrect)
 
 
 def text_objects(text, color, font_name, size):
@@ -45,16 +71,6 @@ def text_on_screen(text, color, font_name, size, y_displace=0):
     text_surf, text_rect = text_objects(text, color, font_name, size)
     text_rect.center = (400, 300 + y_displace)
     gameDisplay.blit(text_surf, text_rect)
-
-# zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
-points = {'zosia': 0, 'hrabia': 0, 'mushroom': 0, 'dworek': 0, 'zamek':0}
-myfont = pygame.font.SysFont("Georgia", 15)
-score = 0
-showme = ""
-cloud_coord = (0, 0)
-cloud_att = False
-lives = 3
-cr = 0  # wejscie do dworku / zamku
 
 # zwierzeta ------------------------------------------------------------------------------------------------------------
 
@@ -101,23 +117,65 @@ bear = Animal("bear", 300, 300, "niedz.png")
 
 class Character(pygame.sprite.Sprite):
 
-    def __init__(self, name, x, y, pic, text, cloud_coord_x, cloud_coord_y):
+    def __init__(self, name, x, y, pic, text, answer):
         super().__init__()
         self.image = pygame.image.load(pic)
         self.name = name
         self.text = text
-        self.cloud_coord = (cloud_coord_x, cloud_coord_y)
+        self.answer = answer
 
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
 
-hrabia = Character("hrabia", 60, 300, hrabiaP, "jestem hrabia", 60, 120)
-zosia = Character("zosia", 30, 200, zosiaP, "jestem Zosia", 30, 15)
-sedzia = Character("sedzia", 30, 200, sedziaP, "jestem Sędzią", 30, 20)
-wojski = Character("wojski", 230, 100, "wojski.png", "jestem wojski", 230, -80)
-telimena = Character("telimena", 230, 200, telimenaP, "jestem Telimeną", 295, 20)
-
+hrabia = Character("hrabia", 60, 300, hrabiaP, "jestem hrabia", pygame.K_0)
+zosia = Character("zosia", 30, 200, zosiaP, """
+Witaj mój najsłodszy! Ja jak zwykle w ogródku ;). Widzę, że wiedziałeś gdzie mnie szukać.
+Popatrz na moje uprawy, czyż nie jest cudownie patrzeć jak to wszystko rośnie i dojrzewa?
+Ah mój najdroższy! Masz ze sobą obrazek, który ci dałam gdy wyjeżdżałeś? Na pewno masz go ze sobą!
+Pamiętasz kto na nim był?
+A św. Genowefa
+B św. Józef
+C św. Katarzyna
+""", pygame.K_a)
+sedzia = Character("sedzia", 30, 200, sedziaP, """
+Witaj Tadeuszu! Dobrze cię widzieć! Szukasz swojej Zosieńki? To tak dobra dziewczyna!
+I do tego całkiem gospodarna i ładniutka. Telimena wszystkiego ją nauczyła. Jaka szkoda,
+że jej matka Ewa nie dożyła tego czasu, gdy to dziewcze tak wyrosło. Jesteś od niej starszy Tadeuszu,
+musisz dbać o tą delikatną istotę. Zaraz... Właściwie ile wy macie lat? (Zosia, Tadeusz)
+A 18, 22
+B 14, 20
+C 16, 20
+""", pygame.K_b)
+wojski = Character("wojski", 230, 100, wojskiP, "jestem wojski", pygame.K_0)
+telimena = Character("telimena", 230, 200, telimenaP, """
+Kogo ja widzę? Przyszedłeś mi znów pomóc pozbyć się tych paskudnych owadów?
+Bardzo cenię sobie Twoją pomoc... Na szczęście nie widziałam tu dzisiaj tych okropnych mrówek.
+Spotkałeś może Hrabiego? Ah, to i tak już teraz nieważne... Nie wiem czy wiesz,
+ale wybieramy się z mężem w podróż do Petersburga.
+Tadeuszu! Czy ty mnie w ogóle słuchasz?! Pewnie na pamiętasz nawet kto jest moim mężem...
+A Rejent
+B Asesor
+C Hreczecha
+""", pygame.K_a)
+gerwazy = Character("gerwazy", 400, 450, gerwazyP, """
+Mopanku Mopanku! Cóż Ty robisz przy tym Zamku? Jeśliś przyszedł do Hrabiego,
+to Pana nie ma w tejże chwili. A to ostatni z Horeszków po kądzieli.
+Ma najszlachetniejszy spośród najszlachetniejszych herbów. Każdy powinien wiedzieć jak wygląda.
+Żywię nadzieję, że pamiętasz co jest przedstawione na tym herbie.
+A Stokozic
+B Półrożec
+C Półkozic
+""", pygame.K_c)
+macko = Character("macko", 100, 100, mackoP, """
+Witaj w Dobrzynie przyjacielu! O! Uważaj na tego królika! Jest najodważniejszy z całej gromady.
+Mówię na niego Bartek Ważniak. Pewnie wiesz, że tu u nas w Dobrzynie mężczyźni mają na imię
+Bartek lub Maciek. Wśród kobiet też tylko dwa imiona cieszą się popularnością.
+Pamiętasz chociaż jedno z nich?
+A Jóźka
+B Maryna
+C Danuśka
+""", pygame.K_b)
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -151,16 +209,16 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, walls, chars, anim):
 
-        global showme
+        global char
         global score
-        global cloud_coord
-        global cloud_att
+        global gameDisplay
+        global text_field_att
         self.rect.x += self.change_x
 
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
             if block.name == "mushroom":
-                showme = "you chose wisely"
+                # showme = "you chose wisely" - do zmiany
                 if points['mushroom'] == 0:
                     points['mushroom'] = 1
                     score += 1
@@ -173,9 +231,8 @@ class Player(pygame.sprite.Sprite):
 
         char_hit_list = pygame.sprite.spritecollide(self, chars, False)
         for character in char_hit_list:
-            showme = character.text
-            cloud_att = True
-            cloud_coord = character.cloud_coord
+            char = character
+            text_field_att = True
             if self.change_x > 0:
                 self.rect.right = character.rect.left
             else:
@@ -186,20 +243,34 @@ class Player(pygame.sprite.Sprite):
             lives -= 1
 
         self.rect.y += self.change_y
-
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
             global cr
-            if block.name == "dworek":
+            if block.name == "dworek":  # wejscie do dworku
                 if points['dworek'] == 0:
                     cr = 7
+                    gameDisplay.blit(ramka, (20, 20))
+                    texts("""
+Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich! Przecież to muchy szlacheckie!
+Toż to specjalność Wojskiego! Wygląda na to, że największy wróg tych owadów gdzieś się zawieruszył...
+No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dworku,
+uważając by nie wpaść w żadną z much. Powodzenia!
+                    """)
+                    pygame.display.update()
+                    pygame.time.wait(10000)
                     self.rect.bottom = 575
-            elif block.name == "krawedzX":
+            elif block.name == "krawedzX" and cr == 7:
                 self.rect.top = 370
                 if points['dworek'] == 0:
                     points['dworek'] = 1
                     score += 1
                     cr = 3
+            elif block.name == "krawedzX" and cr == 8:
+                self.rect.top = 370
+                if points['zamek'] == 0:
+                    points['zamek'] = 1
+                    score += 1
+                    cr = 2
             elif block.name == "zamek":
                 if points['zamek'] == 0:
                     cr = 8
@@ -213,9 +284,8 @@ class Player(pygame.sprite.Sprite):
 
         char_hit_list = pygame.sprite.spritecollide(self, chars, False)
         for character in char_hit_list:
-            showme = character.text
-            cloud_coord = character.cloud_coord
-            cloud_att = True
+            char = character
+            text_field_att = True
             if self.change_y > 0:
                 self.rect.bottom = character.rect.top
             else:
@@ -280,7 +350,7 @@ class Room3(Room):
         walls = [["krawedz", 0, 0, barY],
                  ["krawedz", 0, 0, barX],
                  ["krawedz", 0, 580, barX],
-                 ["zamek",250,200,"zamek.png"]
+                 ["zamek", 250, 200, zamekP]
                  ]
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
@@ -290,6 +360,7 @@ class Room3(Room):
 
         self.char_list.add(zosia)
         self.char_list.add(hrabia)
+        self.char_list.add(gerwazy)
 
 
 class Room4(Room):
@@ -328,6 +399,8 @@ class Room5(Room):
             self.wall_list.add(wall)
 
         # #############################################################3
+
+        self.char_list.add(macko)
 
 
 class Room6(Room):
@@ -369,7 +442,8 @@ class Room7(Room):
 
 class wdworku(Room):
     """wszystko w dworku"""
-#cr =7
+    # cr = 7
+
     def __init__(self):
         super().__init__("floor.png")
 
@@ -389,9 +463,10 @@ class wdworku(Room):
         self.animal_list.add(mucha3)
         self.animal_list.add(mucha4)
 
+
 class wzamku(Room):
-    """wszystko w dworku"""
-    # cr =8
+    """wszystko w zamku"""
+    # cr = 8
 
     def __init__(self):
         super().__init__("floor.png")
@@ -475,12 +550,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-            global showme
-            global cloud_coord
-            global cloud_att
+            global char
+            global text_field_att
             if event.type == pygame.KEYDOWN:
-                showme = ""
-                cloud_att = False
+                text_field_att = False
                 if event.key == pygame.K_LEFT:
                     player.changespeed(-5, 0)
                 if event.key == pygame.K_RIGHT:
@@ -573,18 +646,26 @@ def main():
         current_room.wall_list.draw(screen)  # wyswietlanie scian
         current_room.char_list.draw(screen)  # wyswietlanie postaci
         current_room.animal_list.draw(screen)  # wyswietlanie zwierzat
-        if cloud_att:  # wyswietlanie chmury
-            screen.blit(cloud, cloud_coord)
-        label = myfont.render(showme, 1, (5, 5, 0))  # TEKST postaci
-        screen.blit(label, (cloud_coord[0] + 95, cloud_coord[1] + 85))
+        if text_field_att and answers[char.name] == 0:  # wyswietlanie ramki i tekstow postaci
+            screen.blit(ramka, (20, 20))
+            texts(char.text)
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == char.answer:
+                        score += 1
+                        answers[char.name] = 1
+                    else:
+                        lives -= 1
+            player.change_x = 0
+            player.change_y = 0
         points = myfont.render("Wynik: " + str(score), 1, WHITE)  # WYNIK
         screen.blit(points, (720, 2))
         if lives > 2:
-            screen.blit(heart, (640, 3))  # ZYCIA
-            screen.blit(heart, (660, 3))
+            screen.blit(heart, (620, 3))  # ZYCIA
+            screen.blit(heart, (650, 3))
             screen.blit(heart, (680, 3))
         elif lives > 1:
-            screen.blit(heart, (660, 3))  # ZYCIA
+            screen.blit(heart, (650, 3))  # ZYCIA
             screen.blit(heart, (680, 3))
         elif lives == 1:
             screen.blit(heart, (680, 3))  # ZYCIA

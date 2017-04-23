@@ -34,7 +34,7 @@ zamekP = "zamek.png"
 ramka = pygame.image.load("ramka.png")
 
 # zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
-points = {'zosia': 0, 'hrabia': 0, 'mushroom': 0, 'dworek': 0, 'zamek': 0}
+points = {'zosia': 0, 'hrabia': 0, 'telimena': 0, 'gerwazy': 0, 'macko': 0, 'sedzia': 0, 'wojski': 0, 'mushroom': 0, 'dworek': 0, 'zamek': 0}
 answers = {'zosia': 0, 'telimena': 0, 'gerwazy': 0, 'macko': 0, 'sedzia': 0, 'wojski': 0, 'hrabia': 0}
 myfont = pygame.font.SysFont("Bevan", 21)
 score = 0
@@ -42,6 +42,7 @@ text_field_att = False
 char = 'zosia'
 lives = 3
 cr = 0  # wejscie do dworku / zamku
+pl = [0,0]
 
 # funkcje wyswietlania tekstu ------------------------------------------------------------------------------------------
 gameDisplay = pygame.display.set_mode((800, 600))
@@ -158,7 +159,7 @@ A Rejent
 B Asesor
 C Hreczecha
 """, pygame.K_a)
-gerwazy = Character("gerwazy", 400, 450, gerwazyP, """
+gerwazy = Character("gerwazy", 320, 450, gerwazyP, """
 Mopanku Mopanku! Cóż Ty robisz przy tym Zamku? Jeśliś przyszedł do Hrabiego,
 to Pana nie ma w tejże chwili. A to ostatni z Horeszków po kądzieli.
 Ma najszlachetniejszy spośród najszlachetniejszych herbów. Każdy powinien wiedzieć jak wygląda.
@@ -246,9 +247,33 @@ class Player(pygame.sprite.Sprite):
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
             global cr
-            if block.name == "dworek":  # wejscie do dworku
+            if block.name == "dworek" and self.change_y<0:  # wejscie do dworku
                 if points['dworek'] == 0:
                     cr = 7
+                    gameDisplay.blit(ramka, (20, 20))
+                    texts("""
+Instrukcja do zamku.
+Powodzenia!
+                    """)
+                    pygame.display.update()
+                    done = False
+                    while not done:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_SPACE:
+                                    done = True
+            elif block.name == "krawedzX":
+                if points['dworek'] == 0:
+                    points['dworek'] = 1
+                    score += 1
+                    cr = 3
+            elif block.name == "krawedzXzamek":
+                if points['zamek'] == 0:
+                    points['zamek'] = 1
+                    score += 1
+                    cr = 2
+            elif block.name == "zamek" and self.change_y<0:
+                if points['zamek'] == 0:
                     gameDisplay.blit(ramka, (20, 20))
                     texts("""
 Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich! Przecież to muchy szlacheckie!
@@ -257,24 +282,14 @@ No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dwo
 uważając by nie wpaść w żadną z much. Powodzenia!
                     """)
                     pygame.display.update()
-                    pygame.time.wait(10000)
-                    self.rect.bottom = 575
-            elif block.name == "krawedzX" and cr == 7:
-                self.rect.top = 370
-                if points['dworek'] == 0:
-                    points['dworek'] = 1
-                    score += 1
-                    cr = 3
-            elif block.name == "krawedzX" and cr == 8:
-                self.rect.top = 370
-                if points['zamek'] == 0:
-                    points['zamek'] = 1
-                    score += 1
-                    cr = 2
-            elif block.name == "zamek":
-                if points['zamek'] == 0:
+                    done = False
+                    while not done:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_SPACE:
+                                    done = True
+                    self.change_x = 0
                     cr = 8
-                    self.rect.bottom = 575
             if self.change_y > 0:
                 self.rect.bottom = block.rect.top
             else:
@@ -472,7 +487,7 @@ class wzamku(Room):
         super().__init__("floor.png")
 
         walls = [["krawedz", 0, 0, barY],
-                 ["krawedzX", 0, 0, barX],
+                 ["krawedzXzamek", 0, 0, barX],
                  ["krawedz", 0, 580, barX],
                  ["krawedz", 780, 0, barY]
                  ]
@@ -580,10 +595,18 @@ def main():
             item.move(random.randint(-3, 3), random.randint(-3, 3))
         global cr
         if cr != 0:
+            if current_room_no<6:
+                player.changespeed(0,5)
             current_room_no = cr
-            current_room = rooms[cr]
-        if player.rect.x < -15:
+            current_room = rooms[current_room_no]
+            if cr == 7 or cr ==8:
+                player.rect.y = 490
+                player.rect.x = 740
+            else:
+                player.rect.y = 470
+                player.rect.x = 390
             cr = 0
+        if player.rect.x < -15:
             if current_room_no == 0:
                 current_room_no = 2
                 current_room = rooms[current_room_no]
@@ -596,8 +619,7 @@ def main():
                 current_room_no = 1
                 current_room = rooms[current_room_no]
                 player.rect.x = 790
-        if player.rect.x > 801:
-            cr = 0
+        if player.rect.x > 805:
             if current_room_no == 0:
                 current_room_no = 1
                 current_room = rooms[current_room_no]
@@ -611,7 +633,6 @@ def main():
                 current_room = rooms[current_room_no]
                 player.rect.x = 0
         if player.rect. y < -15:
-            cr = 0
             if current_room_no == 0:
                 current_room_no = 3
                 current_room = rooms[current_room_no]
@@ -624,8 +645,7 @@ def main():
                 current_room_no = 0
                 current_room = rooms[current_room_no]
                 player.rect.y = 600
-        if player.rect.y > 600:
-            cr = 0
+        if player.rect.y > 605:
             if current_room_no == 3:
                 current_room_no = 0
                 current_room = rooms[current_room_no]
@@ -654,7 +674,7 @@ def main():
                     if event.key == char.answer:
                         score += 1
                         answers[char.name] = 1
-                    else:
+                    elif event.key == pygame.K_a or event.key == pygame.K_b or event.key == pygame.K_c:
                         lives -= 1
             player.change_x = 0
             player.change_y = 0

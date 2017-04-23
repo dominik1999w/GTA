@@ -13,7 +13,7 @@ pygame.init()
 
 # nazwy plikow png -----------------------------------------------------------------------------------------------------
 heart = pygame.image.load("heart.png")
-flower = "flower.png"
+flower = pygame.image.load("flower.png")
 tadeuszP = "tadko.png"
 telimenaP = "telimena.png"
 wojskiP = "wojski.png"
@@ -22,15 +22,15 @@ sedziaP = "sedzia.png"
 hrabiaP = "hrabia.png"
 gerwazyP = "gerwazy.png"
 mackoP = "macko.png"
-mushroom = "mushroom.png"
-barX = "barX.png"
-barY = "barY.png"
-zameksign = "zameksign.png"
-lassign = "lassign.png"
-dworeksign = "dworeksign.png"
-dobrzynsign = "dobrzyn.png"
-dworekP = "dworek.png"
-zamekP = "zamek.png"
+mushroom = pygame.image.load("mushroom.png")
+barX = pygame.image.load("barX.png")
+barY = pygame.image.load("barY.png")
+zameksign = pygame.image.load("zameksign.png")
+lassign = pygame.image.load("lassign.png")
+dworeksign = pygame.image.load("dworeksign.png")
+dobrzynsign = pygame.image.load("dobrzyn.png")
+dworekP = pygame.image.load("dworek.png")
+zamekP = pygame.image.load("zamek.png")
 ramka = pygame.image.load("ramka.png")
 
 # zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ class Wall(pygame.sprite.Sprite):
 
     def __init__(self, name, x, y, pic):
         super().__init__()
-        self.image = pygame.image.load(pic)
+        self.image = pic
         self.name = name
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
@@ -202,6 +202,7 @@ class Player(pygame.sprite.Sprite):
     def move(self, walls, chars, anim):
 
         global char
+        global cr
         global score
         global gameDisplay
         global text_field_att
@@ -214,6 +215,11 @@ class Player(pygame.sprite.Sprite):
                 if points['mushroom'] == 0:
                     points['mushroom'] = 1
                     score += 1
+            elif block.name == "krawedzEnd":
+                if points['dworek'] == 0:
+                    points['dworek'] = 1
+                    score += 1
+                    cr = 3
             if self.change_x > 0:
                 self.rect.right = block.rect.left
             else:
@@ -237,7 +243,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.change_y
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
-            global cr
             if block.name == "dworek" and self.change_y<0:  # wejscie do dworku
                 if points['dworek'] == 0:
                     cr = 7
@@ -255,11 +260,6 @@ uważając by nie wpaść w żadną z much. Powodzenia!
                             if event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_SPACE:
                                     done = True
-            elif block.name == "krawedzX":
-                if points['dworek'] == 0:
-                    points['dworek'] = 1
-                    score += 1
-                    cr = 3
             elif block.name == "krawedzXzamek":
                 if points['zamek'] == 0:
                     points['zamek'] = 1
@@ -314,7 +314,7 @@ class Room(object):
 
 class Room1(Room):
     """ wszystko co jest w 1. pokoju"""
-
+    # cr = 0
     def __init__(self):
         super().__init__("grasscross.png")
 
@@ -452,11 +452,46 @@ class wdworku(Room):
 
     def __init__(self):
         super().__init__("floor.png")
-
+        dwX = pygame.image.load("dwX.png")
+        dwY = pygame.image.load("dwY.png")
+        dwEnd =pygame.image.load("dwEnd.png")
         walls = [["krawedz", 0, 0, barY],
-                 ["krawedzX", 0, 0, barX],
+                 ["krawedz", 0, 0, barX],
                  ["krawedz", 0, 580, barX],
-                 ["krawedz", 780, 0, barY]
+                 ["krawedz", 780, 0, barY],
+                 ["krawedzEnd", 20, 20, dwEnd],
+                 #         labirynt
+                 ["krawedz", 680, 480, dwY],
+                 ["krawedz", 580, 370, dwY],
+                 ["krawedz", 480, 480, dwY],
+                 ["krawedz", 380, 370, dwY],
+                 ["krawedz", 280, 480, dwY],
+                 ["krawedz", 180, 370, dwY],
+                 ["krawedz", 80, 480, dwY],
+
+                 ["krawedz", 680, 350, dwX],
+                 ["krawedz", 580, 350, dwX],
+                 ["krawedz", 480, 350, dwX],
+                 ["krawedz", 380, 350, dwX],
+                 ["krawedz", 280, 350, dwX],
+                 ["krawedz", 180, 350, dwX],
+                 ["krawedz", 80, 350, dwX],
+
+                 ["krawedz", 680, 260, dwY],
+                 ["krawedz", 580, 140, dwY],
+                 ["krawedz", 480, 260, dwY],
+                 ["krawedz", 380, 140, dwY],
+                 ["krawedz", 280, 260, dwY],
+                 ["krawedz", 180, 140, dwY],
+                 ["krawedz", 80, 260, dwY],
+
+                 ["krawedz", 580, 120, dwX],
+                 ["krawedz", 480, 120, dwX],
+                 ["krawedz", 380, 120, dwX],
+                 ["krawedz", 280, 120, dwX],
+                 ["krawedz", 180, 120, dwX],
+                 ["krawedz", 80, 120, dwX],
+                 ["krawedz", 0, 120, dwX],
                  ]
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
@@ -666,7 +701,7 @@ Naciśnij spację
         if text_field_att and answers[char.name] == 0:  # wyswietlanie ramki i tekstow postaci
             screen.blit(ramka, (20, 20))
             global myfont
-            texts(char.text, 34, -10, myfont, 22)
+            texts(char.text, 34, -4, myfont, 22)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == char.answer:
@@ -679,14 +714,14 @@ Naciśnij spację
         points = myfont.render("Wynik: " + str(score), 1, WHITE)  # WYNIK
         screen.blit(points, (720, 2))
         if lives > 2:
-            screen.blit(heart, (650, 3))  # ZYCIA
-            screen.blit(heart, (670, 3))
-            screen.blit(heart, (690, 3))
+            screen.blit(heart, (620, 3))  # ZYCIA
+            screen.blit(heart, (650, 3))
+            screen.blit(heart, (680, 3))
         elif lives > 1:
-            screen.blit(heart, (670, 3))  # ZYCIA
-            screen.blit(heart, (690, 3))
+            screen.blit(heart, (650, 3))  # ZYCIA
+            screen.blit(heart, (680, 3))
         elif lives == 1:
-            screen.blit(heart, (690, 3))  # ZYCIA
+            screen.blit(heart, (680, 3))  # ZYCIA
         else:
             # --- Game Over ---
             screen.fill(DARK_RED)

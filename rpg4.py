@@ -701,7 +701,7 @@ Naciśnij spację
         if text_field_att and answers[char.name] == 0:  # wyswietlanie ramki i tekstow postaci
             screen.blit(ramka, (20, 20))
             global myfont
-            texts(char.text, 34, -4, myfont, 22)
+            texts(char.text, 34, -10, myfont, 22)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == char.answer:
@@ -713,15 +713,15 @@ Naciśnij spację
             player.change_y = 0
         points = myfont.render("Wynik: " + str(score), 1, WHITE)  # WYNIK
         screen.blit(points, (720, 2))
-        if lives > 2:
-            screen.blit(heart, (620, 3))  # ZYCIA
-            screen.blit(heart, (650, 3))
-            screen.blit(heart, (680, 3))
+                if lives > 2:
+            screen.blit(heart, (650, 4))
+            screen.blit(heart, (670, 4))
+            screen.blit(heart, (690, 4))
         elif lives > 1:
-            screen.blit(heart, (650, 3))  # ZYCIA
-            screen.blit(heart, (680, 3))
+            screen.blit(heart, (670, 4))  # ZYCIA
+            screen.blit(heart, (690, 4))
         elif lives == 1:
-            screen.blit(heart, (680, 3))  # ZYCIA
+            screen.blit(heart, (690, 4))  # ZYCIA
         else:
             # --- Game Over ---
             screen.fill(DARK_RED)

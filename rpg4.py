@@ -247,7 +247,7 @@ Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich!
 Toż to specjalność Wojskiego! Wygląda na to, że największy wróg tych owadów gdzieś się zawieruszył...
 No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dworku,
 uważając by nie wpaść w żadną z much. Powodzenia!
-                    """)
+                    """, 34, -3, myfont, 22)
                     pygame.display.update()
                     done = False
                     while not done:
@@ -271,7 +271,7 @@ uważając by nie wpaść w żadną z much. Powodzenia!
                     texts("""
 Instrukcja do zamku.
 Powodzenia!
-                    """)
+                    """, 34, -3, myfont, 22)
                     pygame.display.update()
                     done = False
                     while not done:

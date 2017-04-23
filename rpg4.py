@@ -34,9 +34,9 @@ zamekP = "zamek.png"
 ramka = pygame.image.load("ramka.png")
 
 # zmienne pomocnicze globalne ------------------------------------------------------------------------------------------
-points = {'zosia': 0, 'hrabia': 0, 'telimena': 0, 'gerwazy': 0, 'macko': 0, 'sedzia': 0, 'wojski': 0, 'mushroom': 0, 'dworek': 0, 'zamek': 0}
+points = {'mushroom': 0, 'dworek': 0, 'zamek': 0 }
 answers = {'zosia': 0, 'telimena': 0, 'gerwazy': 0, 'macko': 0, 'sedzia': 0, 'wojski': 0, 'hrabia': 0}
-myfont = pygame.font.SysFont("Bevan", 21)
+myfont = pygame.font.SysFont("monotypecorsiva", 20)
 score = 0
 text_field_att = False
 char = 'zosia'
@@ -48,30 +48,16 @@ pl = [0,0]
 gameDisplay = pygame.display.set_mode((800, 600))
 
 
-def texts(lines):
+def texts(lines, x, y, myfont, h):
     text = myfont.render('', 1, WHITE)
     textrect = text.get_rect()
-    textrect.x = 34
-    textrect.y = -6
+    textrect.x = x
+    textrect.y = y
     lines = lines.split('\n')
     for i in lines:
         text = myfont.render(i, 1, WHITE)
-        textrect.centery += 22
+        textrect.centery += h
         gameDisplay.blit(text, textrect)
-
-
-def text_objects(text, color, font_name, size):
-
-    font = pygame.font.SysFont(font_name, size)
-    text_surface = font.render(text, True, color)
-    return text_surface, text_surface.get_rect()
-
-
-def text_on_screen(text, color, font_name, size, y_displace=0):
-
-    text_surf, text_rect = text_objects(text, color, font_name, size)
-    text_rect.center = (400, 300 + y_displace)
-    gameDisplay.blit(text_surf, text_rect)
 
 # zwierzeta ------------------------------------------------------------------------------------------------------------
 
@@ -129,7 +115,12 @@ class Character(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = x
 
-hrabia = Character("hrabia", 60, 300, hrabiaP, "jestem hrabia", pygame.K_0)
+hrabia = Character("hrabia", 60, 300, hrabiaP, """
+Hrabi tekst
+A 0
+B 0
+C 0
+""", pygame.K_0)
 zosia = Character("zosia", 30, 200, zosiaP, """
 Witaj mój najsłodszy! Ja jak zwykle w ogródku ;). Widzę, że wiedziałeś gdzie mnie szukać.
 Popatrz na moje uprawy, czyż nie jest cudownie patrzeć jak to wszystko rośnie i dojrzewa?
@@ -252,8 +243,10 @@ class Player(pygame.sprite.Sprite):
                     cr = 7
                     gameDisplay.blit(ramka, (20, 20))
                     texts("""
-Instrukcja do zamku.
-Powodzenia!
+Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich! Przecież to muchy szlacheckie!
+Toż to specjalność Wojskiego! Wygląda na to, że największy wróg tych owadów gdzieś się zawieruszył...
+No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dworku,
+uważając by nie wpaść w żadną z much. Powodzenia!
                     """)
                     pygame.display.update()
                     done = False
@@ -276,10 +269,8 @@ Powodzenia!
                 if points['zamek'] == 0:
                     gameDisplay.blit(ramka, (20, 20))
                     texts("""
-Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich! Przecież to muchy szlacheckie!
-Toż to specjalność Wojskiego! Wygląda na to, że największy wróg tych owadów gdzieś się zawieruszył...
-No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dworku,
-uważając by nie wpaść w żadną z much. Powodzenia!
+Instrukcja do zamku.
+Powodzenia!
                     """)
                     pygame.display.update()
                     done = False
@@ -537,18 +528,24 @@ def main():
 
     # ------------------------------------------------------------------------------------------------------------------
     screen.fill(GREEN)
-    text_on_screen("GTA 1812", WHITE, 'Bevan', 200, -70)
+    font1 = pygame.font.SysFont("monotypecorsiva", 100)
+    texts("""
+GTA 1812
+    """, 190, 200, font1, 0)
     pygame.display.update()
     pygame.time.wait(2500)
     # ------------------------------------------------------------------------------------------------------------------
     screen.fill(GREEN)
-    text_on_screen("Witaj w 'Gerwazy - Tadeusz - Asesor 1812'!", WHITE, 'Bevan', 30, -120)
-    text_on_screen("Jesteś kosmitą przybyłym do Soplicowa by poznać kulturę ludzi.", WHITE, 'Bevan', 30, -90)
-    text_on_screen("Przyjąłęś postać Tadeusza Soplicy i musisz przekonać pozostałych bohaterów,", WHITE, 'Bevan',
-                   30, -60)
-    text_on_screen("że naprawdę jesteś synem Jacka. Wykonuj ich zadania, a uwierzą Ci!", WHITE, 'Bevan', 30, -30)
-    text_on_screen("Powodzenia!", WHITE, 'Bevan', 30)
-    text_on_screen("kliknij spację by rozpocząć przygodę", WHITE, 'Bevan', 25, 100)
+    font2 = pygame.font.SysFont("monotypecorsiva", 30)
+    texts("""
+Witaj w 'Gerwazy - Tadeusz - Asesor 1812'!
+Jesteś kosmitą przybyłym do Soplicowa by poznać
+kulturę ludzi.
+..................
+bla bla bla
+
+Naciśnij spację
+    """, 80, 40, font2, 33)
     pygame.display.update()
     done = False
     while not done:
@@ -668,7 +665,8 @@ def main():
         current_room.animal_list.draw(screen)  # wyswietlanie zwierzat
         if text_field_att and answers[char.name] == 0:  # wyswietlanie ramki i tekstow postaci
             screen.blit(ramka, (20, 20))
-            texts(char.text)
+            global myfont
+            texts(char.text, 34, -4, myfont, 22)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == char.answer:
@@ -692,8 +690,10 @@ def main():
         else:
             # --- Game Over ---
             screen.fill(DARK_RED)
-            text_on_screen("Koniec gry", BLACK, 'Bevan', 200, -100)
-            text_on_screen("Twój wynik to: " + str(score), BLACK, 'Bevan', 75, 75)
+            font3 = pygame.font.SysFont("monotypecorsiva", 60)
+            texts("""
+Koniec Gry
+            """, 300, 200, font3, 0)
             pygame.display.update()
             pygame.time.wait(3000)
             done = True

@@ -187,22 +187,25 @@ class Player(pygame.sprite.Sprite):
 
     change_x = 0
     change_y = 0
-
+    speed = [0,0]
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load(tadeuszP)
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+        self.speed = [0,0]
 
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
+        self.speed = [self.change_x, self.change_y]
 
     def move(self, walls, chars, anim):
 
         global char
         global cr
+        global lives
         global score
         global gameDisplay
         global text_field_att
@@ -237,7 +240,6 @@ class Player(pygame.sprite.Sprite):
                 self.rect.left = character.rect.right
         animal_hit_list = pygame.sprite.spritecollide(self, anim, True)
         if animal_hit_list:
-            global lives
             lives -= 1
 
         self.rect.y += self.change_y
@@ -252,6 +254,7 @@ Ah! Co tu się dzieje?! Skąd się tu wzięło tyle much?! I to nie byle jakich!
 Toż to specjalność Wojskiego! Wygląda na to, że największy wróg tych owadów gdzieś się zawieruszył...
 No cóż... W takim wypadku Tadeuszku, musisz przedrzeć się przez labirynt Dworku,
 uważając by nie wpaść w żadną z much. Powodzenia!
+(naciśnij spację by kontynuować)
                     """, 34, -3, myfont, 22)
                     pygame.display.update()
                     done = False
@@ -265,12 +268,20 @@ uważając by nie wpaść w żadną z much. Powodzenia!
                     points['zamek'] = 1
                     score += 1
                     cr = 2
+            elif block.name == "zycie":
+                if lives==2:
+                    lives = 3
+                    block.kill()
+                elif lives==1:
+                    lives = 2
+                    block.kill()
             elif block.name == "zamek" and self.change_y<0:
                 if points['zamek'] == 0:
                     gameDisplay.blit(ramka, (20, 20))
                     texts("""
 Instrukcja do zamku.
 Powodzenia!
+(naciśnij spację by kontynuować)
                     """, 34, -3, myfont, 22)
                     pygame.display.update()
                     done = False
@@ -378,7 +389,7 @@ class Room4(Room):
         walls = [["krawedz", 0, 0, barY],
                  ["krawedz", 0, 0, barX],
                  ["krawedz", 780, 0, barY],
-                 ["dworek", 270, 170, dworekP]
+                 ["dworek", 270, 170, dworekP],
                  ]
         for item in walls:
             wall = Wall(item[0], item[1], item[2], item[3])
@@ -460,7 +471,8 @@ class wdworku(Room):
                  ["krawedz", 0, 580, barX],
                  ["krawedz", 780, 0, barY],
                  ["krawedzEnd", 20, 20, dwEnd],
-                 #         labirynt
+                 ["zycie", 40, 540, heart],
+                     #         labirynt
                  ["krawedz", 680, 480, dwY],
                  ["krawedz", 580, 370, dwY],
                  ["krawedz", 480, 480, dwY],
@@ -628,7 +640,7 @@ Naciśnij spację
         global cr
         if cr != 0:
             if current_room_no<6:
-                player.changespeed(0,5)
+                player.changespeed(-1*player.speed[0],-1*player.speed[1])
             current_room_no = cr
             current_room = rooms[current_room_no]
             if cr == 7 or cr ==8:
@@ -713,7 +725,7 @@ Naciśnij spację
             player.change_y = 0
         points = myfont.render("Wynik: " + str(score), 1, WHITE)  # WYNIK
         screen.blit(points, (720, 2))
-                if lives > 2:
+        if lives > 2:
             screen.blit(heart, (650, 4))
             screen.blit(heart, (670, 4))
             screen.blit(heart, (690, 4))

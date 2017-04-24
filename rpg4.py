@@ -42,7 +42,7 @@ text_field_att = False
 char = 'zosia'
 lives = 3
 cr = 0  # wejscie do dworku / zamku
-pl = [0,0]
+pl = [0, 0]
 
 # funkcje wyswietlania tekstu ------------------------------------------------------------------------------------------
 gameDisplay = pygame.display.set_mode((800, 600))
@@ -58,6 +58,7 @@ def texts(lines, x, y, myfont, h):
         text = myfont.render(i, 1, WHITE)
         textrect.centery += h
         gameDisplay.blit(text, textrect)
+
 
 # zwierzeta ------------------------------------------------------------------------------------------------------------
 
@@ -187,7 +188,8 @@ class Player(pygame.sprite.Sprite):
 
     change_x = 0
     change_y = 0
-    speed = [0,0]
+    speed = [0, 0]
+
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load(tadeuszP)
@@ -585,14 +587,47 @@ GTA 1812
     screen.fill(GREEN)
     font2 = pygame.font.SysFont("monotypecorsiva", 30)
     texts("""
-Witaj w 'Gerwazy - Tadeusz - Asesor 1812'!
-Jesteś kosmitą przybyłym do Soplicowa by poznać
-kulturę ludzi.
-..................
-bla bla bla
+Witaj!
+Jestem kosmitą Brajankiem z planety Sepulka. Przybyłem na Ziemię,
+by ją poznać i podbić, a potem odbudować Sepulkę na jej obraz
+i podobieństwo. Mój dom jest teraz w stanie kosmicznego konfliktu.
+Wojna trwa już 3921 lat i 4 miesiace. Bratobójcze walki Sepulków
+sprawiły, że nas Sepulczan Krótkonosych została już tylko garstka.
+Zawsze byłem pod wrażeniem Was, Ziemian, że potraficie żyć ze sobą
+w zgodzie i pokoju. Aby zachować nasz gatunek
+(nim Sepulczanie Szerokostopi wybiją nas całkowicie)
+postanowiłem przylecieć na Ziemię, by znaleźć rozwiązanie na nasze
+problemy i zbudować nasze społeczeństwo na bazie Waszego.
+                                                                            strona 1/2
 
-Naciśnij spację
-    """, 80, 40, font2, 33)
+Naciśnij spację, by kontynuować
+    """, 25, -30, font2, 33)
+    pygame.display.update()
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    done = True
+    # ------------------------------------------------------------------------------------------------------------------
+    screen.fill(GREEN)
+    font2 = pygame.font.SysFont("monotypecorsiva", 30)
+    texts("""
+Wybrałem Soplicowo, ponieważ tam wszystko jest uporządkowana
+i zharmonizowane. Postanowiłem przebrać się za jednego
+z tam bywających osobników. Jest to niejaki Tadeusz Soplica,
+bratanek najważniejszej osoby we wsi - Sędziego. Aby zebrać
+potrzebne mi informacje muszę najpierw wzbudzić zaufanie
+w mieszkańcach Soplicowa i ich przyjaciołach. Muszą mi
+uwierzyć, że jestem Tadeuszem. Będą mi zadawać różne pytania,
+na które powinienem znać odpowiedź. I tutaj potrzebuję Twojej
+pomocy. Pomóż mi odnaleźć wszystkie postacie i odpowiedzieć
+na ich pytania, by w Sepulce znów nastał pokój!
+Liczę na Ciebie!
+                                                                            strona 2/2
+
+Naciśnij spację, by rozpocząć przygodę!
+        """, 25, -30, font2, 33)
     pygame.display.update()
     done = False
     while not done:
